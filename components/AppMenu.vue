@@ -13,21 +13,36 @@
       </ul>
     </div>
     <div class="login">
-      <button @click="out">Выйти</button>
-      <button @click="login" ><span class="google_img"><img src="@/static/img/ant-design_google-circle-filled.svg" alt=""></span><span class="login_b">Вход</span> <span class="login_img"><img src="@/static/img/Arrow.svg" alt=""></span></button>
+
+      <div class="zuza">
+        <div class="img_url" v-if="check_login"><img :src="img_url" alt=""> </div>
+        <div v-if="check_login">Привет - {{name}} </div>
+        <div>
+          <button v-if="check_login" @click="out">Выйти</button>
+          <button v-else @click="login" ><span class="google_img"><img src="@/static/img/ant-design_google-circle-filled.svg" alt=""></span><span class="login_b">Вход</span> <span class="login_img"><img src="@/static/img/Arrow.svg" alt=""></span></button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="js">
+import Vue from 'vue'
 export default Vue.extend({
+  data(){
+    return{
+      check_login: false,
+      name: '',
+      img_url: ''
+    }
+  },
   name: "AppMenu",
   methods: {
-    out(){
+    async out(){
       const auth2 = window.gapi.auth2.getAuthInstance()
-      auth2.signOut().then(function() {
-        console.log('User signed out.')
-      })
+      auth2.disconnect()
+      auth2.signOut()
+      this.check_login = false
     },
     async login() {
       const auth2 = window.gapi.auth2.getAuthInstance()
@@ -42,10 +57,13 @@ export default Vue.extend({
         console.log('Family Name: ' + profile.getFamilyName())
         console.log('Image URL: ' + profile.getImageUrl())
         console.log('Email: ' + profile.getEmail())
+        this.name = profile.getName()
+        this.img_url = profile.getImageUrl()
 
         // токен
         const id_token = googleUser.getAuthResponse().id_token
         console.log('ID Token: ' + id_token)
+        this.check_login = true
       })
     }
   },
@@ -69,7 +87,18 @@ export default Vue.extend({
 </script>
 
 <style scoped>
-
+.img_url img {
+  width: 30px;
+  height: 30px;
+  border-radius: 100px;
+}
+.zuza{
+  display: flex;
+  justify-content: space-between;
+}
+.zuza div{
+  margin-left: 10px;
+}
 .g-signin-button {
   /* This is where you control how the button looks. Be creative! */
   display: inline-block;
