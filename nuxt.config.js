@@ -11,7 +11,7 @@ export default {
       { hid: 'description', name: 'description', content: '' }
     ],
     script: [
-      { hid: 'stripe', src: 'https://apis.google.com/js/api:client.js', defer: true }
+      // { hid: 'stripe', src: 'https://apis.google.com/js/api.js', defer: true }
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -21,10 +21,9 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
   ],
-
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    '@/plugins/goolge-api.js'
+    { src: '@/plugins/goolge-api.js', mode: 'client' }
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -42,12 +41,17 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
-
+  compilerOptions: {
+    "types": [
+      "@nuxtjs/auth-next",
+    ]
+  },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
   },

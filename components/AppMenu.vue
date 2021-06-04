@@ -13,44 +13,56 @@
       </ul>
     </div>
     <div class="login">
-      <g-signin-button
-        :params="googleSignInParams"
-        @success="onSignInSuccess"
-        @error="onSignInError">
-        Sign in with Google
-      </g-signin-button>
-      <button ><span class="google_img"><img src="@/static/img/ant-design_google-circle-filled.svg" alt=""></span><span class="login_b">Вход</span> <span class="login_img"><img src="@/static/img/Arrow.svg" alt=""></span></button>
+      <button @click="out">Выйти</button>
+      <button @click="login" ><span class="google_img"><img src="@/static/img/ant-design_google-circle-filled.svg" alt=""></span><span class="login_b">Вход</span> <span class="login_img"><img src="@/static/img/Arrow.svg" alt=""></span></button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
 export default Vue.extend({
   name: "AppMenu",
-  data () {
-    return {
-      /**
-       * The Auth2 parameters, as seen on
-       * https://developers.google.com/identity/sign-in/web/reference#gapiauth2initparams.
-       * As the very least, a valid client_id must present.
-       * @type {Object}
-       */
-      googleSignInParams: {
-        client_id: '554535577319-jiqd47vmvoqpfv1dacg4vfm2qhqvef70.apps.googleusercontent.com'
-      }
+  methods: {
+    out(){
+      const auth2 = window.gapi.auth2.getAuthInstance()
+      auth2.signOut().then(function() {
+        console.log('User signed out.')
+      })
+    },
+    async login() {
+      const auth2 = window.gapi.auth2.getAuthInstance()
+      auth2.signIn().then(googleUser => {
+
+        // метод возвращает объект пользователя
+        // где есть все необходимые нам поля
+        const profile = googleUser.getBasicProfile()
+        console.log('ID: ' + profile.getId()) // не посылайте подобную информацию напрямую, на ваш сервер!
+        console.log('Full Name: ' + profile.getName())
+        console.log('Given Name: ' + profile.getGivenName())
+        console.log('Family Name: ' + profile.getFamilyName())
+        console.log('Image URL: ' + profile.getImageUrl())
+        console.log('Email: ' + profile.getEmail())
+
+        // токен
+        const id_token = googleUser.getAuthResponse().id_token
+        console.log('ID Token: ' + id_token)
+      })
     }
   },
-  methods: {
-    onSignInSuccess (googleUser: { getBasicProfile: () => any }) {
-      // `googleUser` is the GoogleUser object that represents the just-signed-in user.
-      // See https://developers.google.com/identity/sign-in/web/reference#users
-      const profile = googleUser.getBasicProfile() // etc etc
-    },
-    onSignInError (error: any) {
-      // `error` contains any error occurred.
-      console.log('OH NOES', error)
+  mounted(){
+    const _onInit = auth2 => {
+      console.log('init OK', auth2)
     }
+    const _onError = err => {
+      console.log('error', err)
+    }
+    window.gapi.load('auth2', function() {
+      window.gapi.auth2
+        .init({ // не забудьте указать ваш ключ в .env
+          client_id: '554535577319-jiqd47vmvoqpfv1dacg4vfm2qhqvef70.apps.googleusercontent.com',
+        })
+        .then(_onInit, _onError)
+    })
   }
 })
 
